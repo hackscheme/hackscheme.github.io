@@ -2,7 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'
 // import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js'
 import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, setPersistence, browserSessionPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'
-import { getFirestore, collection, doc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
+import { getFirestore, collection, doc, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
 
 export function addFirebase() {
   const firebaseConfig = {
@@ -70,48 +70,55 @@ export function addLogins() {
   })
 }
 
+async function listAll(db) {
+  const querySnapshot = await getDocs(collection(db, "packages"));
+  querySnapshot.forEach((doc) => {
+    let data = doc.data(); 
+    addCard(data)
+  });
+}
+
+function addCard(data) {
+  let div = document.getElementById('results')
+  let package_name = data.package_name
+  let package_version = data.package_version
+  let package_description = data.package_description
+  let author = data.package_author
+  let name = author.name
+  let git = author.git
+
+  let card =
+    `<wired-card elevation="3">
+      <p><i class="fa-solid fa-box"></i> ${package_name}</p>
+      <p>
+        <i class="fa-solid fa-user-secret"></i> 
+        <wired-link href="${git}" target="_blank">${name}</wired-link> 
+      </p>
+      <p><i class="fa-solid fa-code-compare"></i> ${package_version}</p> 
+      <p><i class="fa-solid fa-circle-info"></i> ${package_description}</p>
+    </wired-card>`
+
+  div.innerHTML += card
+}
+
 
 export async function getResults(app) {
   const db = getFirestore(app);
-  let div = document.getElementById('results')
  
   const urlParams = new URLSearchParams(window.location.search);
   let search = urlParams.get('search');
 
-  if (search == null || search == undefined)
-    search = "*";
+  if (search == null || search == undefined || search == "*") {
+    listAll(db)
+    return
+  }
 
-
-  const querySnapshot = await getDocs(collection(db, "packages"));
+  const q = query(collection(db, "packages"), where("package_name", "==", search));
+  const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
     let data = doc.data(); 
-
-    let package_name = data.package_name
-    let package_version = data.package_version
-    let package_description = data.package_description
-    let author = data.package_author
-    let name = author.name
-    let git = author.git
-
-    let cond = package_name.toLowerCase().indexOf(search) != -1 || 
-      package_version.toLowerCase().indexOf(search) != -1 ||
-      name.toLowerCase().indexOf(search) != -1 || search == "*"; 
-
-    if (!cond)
-      return
-
-    let card =
-      `<wired-card elevation="3">
-        <p><i class="fa-solid fa-box"></i> ${package_name}</p>
-        <p>
-          <i class="fa-solid fa-user-secret"></i> 
-          <wired-link href="${git}" target="_blank">${name}</wired-link> 
-        </p>
-        <p><i class="fa-solid fa-code-compare"></i> ${package_version}</p> 
-        <p><i class="fa-solid fa-circle-info"></i> ${package_description}</p>
-      </wired-card>`
-
-    div.innerHTML += card
+    addCard(data)
+    console.log(data)
   });
 }
 
