@@ -4,18 +4,18 @@
   <head>
     <title>Hack Scheme</title>
     <script type="module" src="https://unpkg.com/wired-elements?module"></script>
-    <script type="module" src="https://unpkg.com/wired-elements/lib/wired-dialog.js?module"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/index.js" type="text/javascript"></script>
   </head>
-  <body>
+  <body onload="loadPage()">
     <div class="flex flex-col w-full border border-black m-auto min-h-screen justify-center items-center z-0">
       <h1>HackScheme packages</h1>
       <wired-divider class="wired-rendered"></wired-divider>
-      <wired-search-input placeholder="Search" style="width: 40vw;" class=""></wired-search-input>
+      <wired-search-input id="search_bar" class="justify-center" placeholder="Search" style="width: 40vw;" class=""></wired-search-input>
       <wired-button id="btn2" class="wired-rendered">Search</wired-button>
 
-    <div class="grid grid-cols-2 gap-4 place-content-end h-48 ...">
+    <div class="grid grid-cols-2 gap-4 place-content-end h-48">
       <wired-button elevation="5" id="open_submit" class="wired-rendered">Submit</wired-button>
       <wired-button elevation="5" id="open_login" class="wired-rendered">Login</wired-button>
     </div>
@@ -47,93 +47,15 @@
     </wired-dialog>
 
 
-    <script>
-      const addBtn = (id) => {
-        document.getElementById(`open_${id}`).addEventListener('click', () => {
-          document.getElementById(`${id}_dialog`).open = true;
-        });
-        document.getElementById(`close_${id}`).addEventListener('click', () => {
-          document.getElementById(`${id}_dialog`).open = false;
-        });
-      }
 
-      const closeDialog = (id) => {
-          document.getElementById(`${id}_dialog`).open = false;
-      }
 
-      addBtn('login');
-      addBtn('submit');
-
+    <script type="module">
+      import {addFirebase, addLogins} from "/firebase.js"
+      import {addEvents} from "/events.js"
+      let app = addFirebase()
+      addLogins()
+      addEvents(app)
     </script>
-
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'
-    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js'
-    import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, setPersistence, browserSessionPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
-  
-    const firebaseConfig = {
-      apiKey: "AIzaSyAxU273yLLi-d2yqyez3_UKvM49ST5R2IQ",
-      authDomain: "hackschemedb.firebaseapp.com",
-      projectId: "hackschemedb",
-      storageBucket: "hackschemedb.appspot.com",
-      messagingSenderId: "773032859995",
-      appId: "1:773032859995:web:78fbaed99ddfcc640e227e",
-      measurementId: "G-2NBHEYL166"
-    };
-    const defaultProject = initializeApp(firebaseConfig);
-    console.log(defaultProject.name);  // "[DEFAULT]"
-
-
-    // Sign in with Github
-    document.getElementById('github_btn').addEventListener('click', () => {
-      const provider = new GithubAuthProvider();
-      const auth = getAuth();
-      setPersistence(auth, browserSessionPersistence)
-      
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const credential = GithubAuthProvider.credentialFromResult(result);
-          const token = credential.accessToken;
-          const user = result.user;
-          console.log('Login successful: ' + user);
-          closeDialog('login');
-        }).catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          const email = error.customData.email;
-          const credential = GithubAuthProvider.credentialFromError(error);
-        });
-    })
-
-    // Sign in with Google
-    document.getElementById('google_btn').addEventListener('click', () => {
-      const provider = new GoogleAuthProvider();
-      const auth = getAuth();
-      setPersistence(auth, browserSessionPersistence)
-
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const token = credential.accessToken;
-          const user = result.user;
-
-          console.log('Login successful: ' + user);
-          closeDialog('login');
-        }).catch((error) => {
-          // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // The email of the user's account used.
-          const email = error.customData.email;
-          // The AuthCredential type that was used.
-          const credential = GoogleAuthProvider.credentialFromError(error);
-          console.log("Error: login failed, "+errorMessage);
-          // ...
-        });
-    })
-</script>
 
   </body>
 </html>
