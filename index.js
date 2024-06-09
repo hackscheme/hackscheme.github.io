@@ -9,9 +9,6 @@ const addBtn = (id) => {
   });
 }
 
-const closeDialog = (id) => {
-    document.getElementById(`${id}_dialog`).open = false;
-}
 
 const loadPage = () => {
   addBtn('login')
