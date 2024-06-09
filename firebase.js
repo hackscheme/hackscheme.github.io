@@ -3,6 +3,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 // import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js'
 import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, setPersistence, browserSessionPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'
 import { getFirestore, collection, doc, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
+import { closeDialog } from "/events.js"
 
 export function addFirebase() {
   const firebaseConfig = {
@@ -101,6 +102,14 @@ function addCard(data) {
   div.innerHTML += card
 }
 
+function noResultCard(search) {
+  let card =
+`<wired-card elevation="3">
+  <p> No results found for "${search}"</p>    
+</wired-card>`
+
+  div.innerHTML += card
+}
 
 export async function getResults(app) {
   const db = getFirestore(app);
@@ -112,9 +121,17 @@ export async function getResults(app) {
     listAll(db)
     return
   }
-
   const q = query(collection(db, "packages"), where("package_name", "==", search));
   const querySnapshot = await getDocs(q);
+  let len = querySnapshot.docs.length
+  
+
+  if (len == 0) {
+    noResultCard(search)
+    return 
+  }
+
+
   querySnapshot.forEach((doc) => {
     let data = doc.data(); 
     addCard(data)
