@@ -39,13 +39,44 @@
     </wired-dialog>
 
     <wired-dialog id="submit_dialog">
-      <div>
-      </div>
+        <form class="flex flex-col w-full" onsubmit="return false">
+          <lable>Package name</lable>
+          <wired-input class="w-full" id="_pkg_name" placeholder="mypackage"></wired-input>
+
+          <lable>Package version</lable>
+          <wired-input class="w-full" id="_pkg_version" placeholder="1.0.0"></wired-input>
+
+          <lable>Package description</lable>
+          <wired-input class="w-full" id="_pkg_description" placeholder="What the package does"></wired-input>
+
+          <lable>Package file</lable>
+          <input id="_pkg_file" type="file" accept=".tar.gz" style="background-color: white;"></input>
+
+         <wired-button id="next" elevation="3">Next</wired-button>        
+      </form>
+      <p style="color: red; display: none;" id="_pkg_error_msg">No error</p>
       <div style="text-align: right; padding: 30px 16px 16px;">
         <wired-button id="close_submit">Close dialog</wired-button>
       </div>
     </wired-dialog>
 
+
+    <wired-dialog id="next_dialog">
+        <form class="flex flex-col w-full" onsubmit="return false">
+          <lable>Author name</lable>
+          <wired-input class="w-full" id="_next_author_name" placeholder="yourname"></wired-input>
+
+          <lable>Github Url</lable>
+          <wired-input class="w-full" id="_next_author_url"> </wired-input>
+
+         <wired-button id="submit_pkg" elevation="3">Submit Package</wired-button>        
+      </form>
+      <p style="color: red; display: none;" id="_next_error_msg">No error</p>
+      
+      <div style="text-align: right; padding: 30px 16px 16px;">
+        <wired-button id="close_next">Close dialog</wired-button>
+      </div>
+    </wired-dialog>
 
 
 
